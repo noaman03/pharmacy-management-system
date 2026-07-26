@@ -1,65 +1,156 @@
 # Pharmacy Management System
 
-A Windows Forms pharmacy management application built with C#, .NET Framework 4.8, SQL Server, and Guna UI2 controls.
+[![Windows build](https://github.com/noaman03/pharmacy-system-management-desktop/actions/workflows/build.yml/badge.svg)](https://github.com/noaman03/pharmacy-system-management-desktop/actions/workflows/build.yml)
 
-## Features
+A C# Windows Forms and SQL Server desktop application for pharmacy user administration, medicine inventory, sales, and stock updates.
 
-- Administrator and pharmacist dashboards
-- User creation, profile editing, and user management
-- Medicine inventory creation, update, search, and deletion
-- Medicine selling/cart workflow with stock updates
-- SQL Server database schema included for local setup
+## Project Status
 
-## Tech Stack
+This is a desktop learning project with a build workflow and local database schema. It is appropriate for demonstration with synthetic data, not for real pharmacy, patient, prescription, or payment data.
 
-- C# / Windows Forms
+No application screenshots are currently committed; files under `images/` are interface assets rather than a screenshot gallery.
+
+## Local Demo Credential
+
+> When the `users` table is empty, the application accepts the bootstrap login `root` / `root`. This is only for local demonstration and initial administrator creation. It is hardcoded in `PharmacyManagement/Form1.cs` and is not safe for deployment.
+
+## Roles and Features
+
+| Role | Verified capabilities |
+| --- | --- |
+| Administrator | Open the administrator dashboard, add users, view users, edit the current profile, and manage user records. |
+| Pharmacist | Open the pharmacist dashboard, add medicines, view/search/update inventory, validate medicine availability, build a sales cart, and reduce stock when completing a sale. |
+
+## Technology Stack
+
+- C# and Windows Forms
 - .NET Framework 4.8
 - SQL Server LocalDB or SQL Server Express
-- Guna.UI2.WinForms via NuGet
+- ADO.NET with `System.Data.SqlClient`
+- Guna.UI2.WinForms controls through NuGet
+- GitHub Actions on Windows for restore and build
 
-## Getting Started
+## Database
 
-### Prerequisites
+Run `database/schema.sql` to create the `pharmacy` database and its two tables.
+
+```mermaid
+erDiagram
+    users {
+        int id PK
+        nvarchar userRole
+        nvarchar names
+        bigint mobile
+        nvarchar dob
+        nvarchar email
+        nvarchar username UK
+        nvarchar pass
+    }
+    medic {
+        int id PK
+        nvarchar mid UK
+        nvarchar mname
+        nvarchar mnumber
+        nvarchar mdate
+        nvarchar edate
+        bigint quantity
+        bigint perunit
+    }
+```
+
+No foreign-key relationship is declared between `users` and `medic`. Date fields and passwords are stored as text in the current schema.
+
+## Prerequisites
 
 - Windows
-- Visual Studio 2022 with the `.NET desktop development` workload and .NET Framework 4.8 targeting pack
+- Visual Studio 2022
+- `.NET desktop development` workload
+- .NET Framework 4.8 targeting pack
 - SQL Server LocalDB or SQL Server Express
-- SQL Server Management Studio or Azure Data Studio for running the schema
+- SQL Server Management Studio or Azure Data Studio
 
-### Setup
+## Installation
 
-1. Clone the repository.
-2. Run `database/schema.sql` against your local SQL Server instance.
-3. Confirm the `PharmacyDatabase` connection string in `PharmacyManagement/App.config`.
+```powershell
+git clone https://github.com/noaman03/pharmacy-system-management-desktop.git
+cd pharmacy-system-management-desktop
+```
+
+1. Open SQL Server Management Studio or Azure Data Studio.
+2. Connect to the SQL Server instance you intend to use.
+3. Run `database/schema.sql`.
 4. Open `PharmacyManagement.sln` in Visual Studio.
-5. Restore NuGet packages and build the solution.
-6. Start the app.
+5. Restore NuGet packages.
+6. Build and run the application.
 
-When the `users` table is empty, use the bootstrap login `root` / `root`, then create a real administrator account.
+## Connection Configuration
 
-## Build
+`PharmacyManagement/App.config` defines a connection named `PharmacyDatabase`:
 
-Visual Studio is the easiest path for local development. The repository also includes a GitHub Actions workflow that restores NuGet packages and builds the solution on Windows.
+```text
+Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=pharmacy;Integrated Security=True;TrustServerCertificate=True
+```
+
+Change that connection string for your local SQL Server instance when needed. Do not commit production database passwords or environment-specific credentials.
+
+## Build Validation
+
+Visual Studio is the simplest local build path. From a Developer PowerShell prompt, the solution can also be restored and built with:
 
 ```powershell
 msbuild PharmacyManagement.sln /restore /p:Configuration=Release /p:Platform="Any CPU"
 ```
 
+The repository includes `.github/workflows/build.yml`, which restores NuGet packages and builds the solution on a Windows runner.
+
 ## Project Structure
 
 ```text
-PharmacyManagement/          WinForms application source
-PharmacyManagement/AdminstratorUC/
-PharmacyManagement/PharmacistUC/
-database/schema.sql          SQL Server database setup
-docs/                        Setup and GitHub notes
-images/                      UI image assets
+PharmacyManagement.sln
+PharmacyManagement/
+  AdminstratorUC/             Administrator user controls
+  PharmacistUC/              Pharmacist inventory and sales controls
+  App.config                 SQL Server connection string
+database/
+  schema.sql                 Database and table creation script
+docs/                        Setup and repository notes
+images/                      Interface image assets
 ```
 
-## Notes
+## SQL Server Troubleshooting
 
-This is a desktop learning project. Before using it in a real pharmacy environment, add password hashing, stronger authorization checks, audit logging, backups, and production configuration management.
+- Confirm the `(LocalDB)\MSSQLLocalDB` instance is installed and running.
+- Verify that the `pharmacy` database was created in the same instance named in `App.config`.
+- If using SQL Server Express, replace the data source with the actual instance name.
+- Keep `Initial Catalog=pharmacy` aligned with `database/schema.sql`.
+- Confirm the Windows account running the app can use Integrated Security.
+- Restore NuGet packages before diagnosing missing Guna.UI2 controls.
+- If a local certificate error occurs, review the SQL Server trust configuration instead of copying a production password into source.
+
+## Security Notes
+
+The current `users.pass` field stores passwords as text, and the bootstrap credential is hardcoded. Before any operational use:
+
+- Replace plaintext password storage with a salted password hash and migration plan.
+- Remove the hardcoded bootstrap login.
+- Enforce authorization at every sensitive action, not only through navigation.
+- Move deployment-specific connection settings out of committed configuration.
+- Add audit logs, backups, recovery procedures, and input validation.
+
+See [`SECURITY.md`](SECURITY.md) for the repository security notice.
+
+## Known Limitations
+
+- No patient, prescription, supplier, or payment model is implemented.
+- Password handling is not suitable for real accounts.
+- Dates are stored as `NVARCHAR` rather than SQL date types.
+- The two database tables have no declared relationship.
+- Automated database and interface tests were not found.
 
 ## License
 
-No license has been selected yet. Add a `LICENSE` file before making the repository public if you want others to reuse the code.
+No software license has been selected. The absence of a license means reuse rights have not been granted.
+
+## Contact
+
+[Ahmed Noaman](https://github.com/noaman03) | [LinkedIn](https://www.linkedin.com/in/ahmed-noaman-07ab162b4)
