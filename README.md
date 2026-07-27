@@ -1,6 +1,6 @@
 # Pharmacy Management System
 
-[![Windows build](https://github.com/noaman03/pharmacy-system-management-desktop/actions/workflows/build.yml/badge.svg)](https://github.com/noaman03/pharmacy-system-management-desktop/actions/workflows/build.yml)
+[![Windows build](https://github.com/noaman03/pharmacy-management-system/actions/workflows/build.yml/badge.svg)](https://github.com/noaman03/pharmacy-management-system/actions/workflows/build.yml)
 
 A C# Windows Forms and SQL Server desktop application for pharmacy user administration, medicine inventory, sales, and stock updates.
 
@@ -72,8 +72,8 @@ No foreign-key relationship is declared between `users` and `medic`. Date fields
 ## Installation
 
 ```powershell
-git clone https://github.com/noaman03/pharmacy-system-management-desktop.git
-cd pharmacy-system-management-desktop
+git clone https://github.com/noaman03/pharmacy-management-system.git
+cd pharmacy-management-system
 ```
 
 1. Open SQL Server Management Studio or Azure Data Studio.
